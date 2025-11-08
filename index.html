@@ -406,9 +406,9 @@
       let y = 15;
 
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("My Quiz Answers", 13, y);
-      y += 10;
+      doc.setFontSize(14);
+      doc.text("My Quiz Answers", 14, y);
+      y += 8;
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
@@ -420,11 +420,11 @@
           `Correct Answer: ${q.correctAnswer}`
         ];
         lines.forEach(line => {
-          doc.text(line, 13, y);
-          y += 7;
+          doc.text(line, 14, y);
+          y += 6;
           if (y > 270) { doc.addPage(); y = 20; }
         });
-        y += 5;
+        y += 4;
       });
 
       doc.save("My_Quiz_Answers.pdf");
