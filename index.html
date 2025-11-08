@@ -37,7 +37,7 @@
     <header>
       <div>
         <h1>Gtk Thiran English Class 9 – 10 Marks Test</h1>
-        <div style="font-size:.88rem;color:#556">10 fixed questions — one after another — 30s timer per question</div>
+        <div style="font-size:.88rem;color:#556">10 questions — one after another — 30 seconds time per question</div>
       </div>
       <div class="meta" aria-live="polite">
         <div>Score: <span id="currentScore" class="score">0</span></div>
@@ -368,7 +368,30 @@ let chosenOption = null;
       nextBtn.style.display = 'none';
       downloadBtn.style.display = 'inline-block';
     }
+// 🔁 RESTART QUIZ FUNCTION (new random set each time)
+function restartQuiz() {
+  // Reset quiz state
+  currentQ = 0;
+  score = 0;
+  chosenOption = null;
+  userAnswers = [];
 
+  // Generate a new random set of 10 questions
+  selected = shuffleArray([...bank]).slice(0, 10);
+
+  // Hide download button and feedback
+  document.getElementById("downloadPdfBtn").style.display = "none";
+  feedback.textContent = '';
+  scoreEl.textContent = '0';
+
+  // Reset UI
+  nextBtn.style.display = 'none';
+  submitBtn.disabled = false;
+  skipBtn.disabled = false;
+
+  // Load the first new question
+  loadQuestion();
+    }
     // TIMER
     function startTimer(){
       stopTimer();
