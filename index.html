@@ -420,9 +420,10 @@
           `Correct Answer: ${q.correctAnswer}`
         ];
         lines.forEach(line => {
-          doc.text(line, 14, y);
-          y += 6;
-          if (y > 270) { doc.addPage(); y = 20; }
+          const wrapped = doc.splitTextToSize(line, 180); // 180mm width fits A4 margins
+doc.text(wrapped, 14, y);
+y += wrapped.length * 5; // move down slightly for each wrapped line
+if (y > 270) { doc.addPage(); y = 20; }
         });
         y += 4;
       });
