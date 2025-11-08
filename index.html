@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Thiran English Class 9 – 10 Marks Test</title>
+<style>
+  :root{--bg1:#f0f7ff;--card:#fff;--accent:#2b6cb0;--ok:#16a34a;--bad:#dc2626}
+  html,body{height:100%;margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--bg1),#e6f0ff);display:flex;align-items:center;justify-content:center;padding:12px}
+  .wrap{width:100%;max-width:760px;background:var(--card);border-radius:14px;box-shadow:0 10px 30px rgba(20,30,60,.12);padding:18px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  header h1{margin:0;font-size:1.2rem;color:var(--accent)}
+  .meta{margin-left:auto;text-align:right;font-size:.9rem}
+  .score{font-weight:700;color:#0b6;display:block;font-size:1.4rem}
+  .card{padding:14px;border-radius:10px;border:1px solid #eef5ff;background:linear-gradient(180deg,#fff,#fbfdff);margin-bottom:12px}
+  .sentence{font-size:1.05rem;padding:12px;border-radius:8px;background:#f7fbff;border:1px dashed #dfeeff;min-height:56px;display:flex;align-items:center}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .opt{padding:10px;border-radius:8px;border:1px solid #e6eefc;background:white;cursor:pointer;user-select:none}
+  .opt.selected{outline:3px solid rgba(43,108,176,.12)}
+  .opt.correct{border-color:var(--ok);background:rgba(16,185,129,.06)}
+  .opt.wrong{border-color:var(--bad);background:rgba(220,38,38,.04)}
+  .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  button{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+  .btn-ghost{background:#fff;border:1px solid #dbeefe;color:var(--accent)}
+  .timer{font-weight:700;padding:6px 10px;border-radius:8px;background:#f1f7ff;border:1px solid #dbeefe}
+  .progress{height:8px;background:#eef6ff;border-radius:8px;margin-top:8px;overflow:hidden}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,#2b6cb0,#4f9ae6);width:0%}
+  .feedback{margin-top:8px;font-weight:700;min-height:22px}
+  .hall{margin-top:10px;padding:10px;border-radius:8px;background:#fff7ef;border:1px solid #ffe8cc}
+  .hof-list{margin-top:8px}
+  .hof-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #fff2e6}
+  .certificate{display:none}
+  .hidden { display:none; }
+  .download-link{margin-top:10px;display:none}
+  @media(max-width:620px){
+    .options{grid-template-columns:1fr}
+    header{gap:8px}
+    .meta{text-align:left;margin-left:0}
+    #playerDetails{flex-direction:column}
+    #playerDetails input{flex:1 1 100%; width:100%}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="Thiran English Class 9 - 10 Marks Test">
+    <header>
+      <div>
+        <h1>Gtk Thiran English Class 9 – 10 Marks Test</h1>
+        <div style="font-size:.88rem;color:#556">Random 10-question test — options & questions shuffle every run</div>
+      </div>
+      <div class="meta" aria-live="polite">
+        <div>Score: <span id="currentScore" class="score">0</span></div>
+      </div>
+    </header>
+
+    <div class="card" id="questionCard" aria-live="polite">
+      <div class="sentence" id="sentence">Press <strong>Start Game</strong> to begin the 10 marks test.</div>
+
+      <div class="options" id="options" aria-hidden="true"></div>
+
+      <div class="controls">
+        <button id="submitBtn" disabled>Submit Answer</button>
+        <button id="skipBtn" class="btn-ghost" disabled>Skip</button>
+        <button id="nextBtn" class="btn-ghost" style="display:none">Next</button>
+        <div style="margin-left:auto;font-size:.9rem;color:#667">Q <span id="qIndex">0</span>/<span id="qTotal">10</span></div>
+      </div>
+
+      <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+    </div>
+
+    <div id="playerDetails" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <input id="playerName" placeholder="Name (optional)" style="padding:8px;border-radius:6px;border:1px solid #e1eefc;flex:1 1 30%" maxlength="50" />
+      <input id="playerClass" placeholder="Class (optional)" style="padding:8px;border-radius:6px;border:1px solid #e1eefc;flex:1 1 30%" maxlength="20" />
+      <input id="playerSection" placeholder="Section (optional)" style="padding:8px;border-radius:6px;border:1px solid #e1eefc;flex:1 1 30%" maxlength="20" />
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button id="startBtn">Start Game</button>
+      <button id="restartBtn" class="btn-ghost" style="display:none">Restart</button>
+      <button id="showHofBtn" class="btn-ghost">Show Hall of Fame</button>
+    </div>
+
+    <div class="hall hidden" id="hall" aria-live="polite">
+      <strong>🏆 Hall of Fame (Top 10)</strong>
+      <div class="hof-list" id="hofList"></div>
+
+      <div style="margin-top:10px">
+        <div style="font-size:.95rem">If you made the top score, enter your name:</div>
+        <input id="hofName" placeholder="Your name" style="padding:8px;border-radius:6px;border:1px solid #e1eefc;width:60%;margin-top:8px" maxlength="30"/>
+        <button id="saveHofBtn" style="margin-left:8px">Save</button>
+      </div>
+    </div>
+
+    <canvas id="certificate" class="certificate" width="1000" height="700"></canvas>
+    <a id="certDownloadLink" class="download-link" download="certificate.png">Download Certificate</a>
+  </div>
+
+<script>
+/* ============================
+   Question bank (derived from Thiran English Class-9 PDF)
+   Each item: { sentence, chapter, options: [...], answerText, explanation (optional) }
+   ============================ */
+
+const bank = [
+  // Reading Comprehension / Pollution (from PDF)
+  { sentence: "Pollution means:", chapter:"Reading Comprehension", options:["Adding harmful substances to the environment","Conserving the environment","Feeling empathy for nature","Protecting animals only"], answerText:"Adding harmful substances to the environment", explanation:"Text defines pollution as adding harmful substances to water and air." },
+  { sentence: "Which of the following is an example of human-generated pollution?", chapter:"Reading Comprehension", options:["Cutting down forests","Earthquake","Volcanic eruption","Solar flares"], answerText:"Cutting down forests", explanation:"Human activities like deforestation are listed as human-generated causes." },
+  { sentence: "Aquatic refers to something related to:", chapter:"Reading Comprehension", options:["Water","Soil","Air","Forest"], answerText:"Water", explanation:"Aquatic = relating to water." },
+
+  // From Listening/Paragraph/Comprehension samples
+  { sentence: "Where did Sonu see the poor man?", chapter:"Reading Comprehension", options:["Near a church","At a market","In school","At the station"], answerText:"Near a church", explanation:"The passage states Sonu saw a poor man near a church." },
+  { sentence: "Why did Sonu give the poor man a blanket?", chapter:"Reading Comprehension", options:["Because it was very cold and raining","Because he wanted to punish him","Because the man was rich","To borrow money"], answerText:"Because it was very cold and raining", explanation:"Passage mentions heavy rain and cold — Sonu gave a blanket." },
+
+  // Tenses / Verb forms (from PDF exercises)
+  { sentence: "Choose the correct past participle: 'I have ___ to the market.'", chapter:"Verb Tense", options:["gone","went","go","been"], answerText:"gone", explanation:"Present perfect requires past participle 'gone'." },
+  { sentence: "Select the correct option: 'She ___ breakfast already.'", chapter:"Verb Tense", options:["has eaten","ate","eats","is eating"], answerText:"has eaten", explanation:"Present perfect uses past participle 'eaten'." },
+  { sentence: "Fill: 'They ___ dinner when we arrived.'", chapter:"Verb Tense", options:["were having","have","had","are having"], answerText:"were having", explanation:"Past continuous describes an action in progress in the past." },
+
+  // Subject-Verb Agreement / grammar
+  { sentence: "Choose the correct verb: 'She ___ to the store every Saturday.'", chapter:"Subject-Verb Agreement", options:["goes","go","gone","going"], answerText:"goes", explanation:"Third person singular requires 'goes'." },
+  { sentence: "Choose the correct verb: 'My parents ___ in Mumbai.'", chapter:"Subject-Verb Agreement", options:["live","lives","is living","lived"], answerText:"live", explanation:"Plural 'parents' takes 'live'." },
+
+  // Conjunctions
+  { sentence: "Which conjunction fits: 'I will come ___ I finish my work.'", chapter:"Conjunctions", options:["when","but","so","because"], answerText:"when", explanation:"'When' shows time — on finishing the work." },
+  { sentence: "Which conjunction fits: 'He didn't study, ___ he failed the exam.'", chapter:"Conjunctions", options:["so","but","because","and"], answerText:"so", explanation:"'So' expresses result." },
+
+  // Prepositions
+  { sentence: "Choose correct preposition: 'I will meet you ___ Monday.'", chapter:"Prepositions", options:["on","in","at","by"], answerText:"on", explanation:"Use 'on' for days of the week." },
+  { sentence: "Choose correct preposition: 'She is married ___ a doctor.'", chapter:"Prepositions", options:["to","with","for","at"], answerText:"to", explanation:"'Married to' someone." },
+
+  // Voice (active/passive)
+  { sentence: "Passive form: 'He wrote a letter.' →", chapter:"Voice", options:["A letter was written by him.","A letter is written by him.","A letter has been written by him.","A letter will be written by him."], answerText:"A letter was written by him.", explanation:"Simple past passive uses 'was written'." },
+  { sentence: "Passive form: 'They are cleaning the room.' →", chapter:"Voice", options:["The room is being cleaned by them.","The room was cleaned by them.","The room has been cleaned by them.","The room will be cleaned by them."], answerText:"The room is being cleaned by them.", explanation:"Present continuous passive: 'is/are being + past participle'." },
+
+  // Gerunds / Infinitives (from PDF)
+  { sentence: "Fill the blank: 'I’d love ___ it!' — choose the verb form.", chapter:"Gerunds and Infinitives", options:["to see","see","seeing","seen"], answerText:"to see", explanation:"'I'd love to see it' is the correct infinitive form." },
+  { sentence: "Choose correct gerund/infinitive: 'She enjoys ___ novels.'", chapter:"Gerunds and Infinitives", options:["reading","to read","read","reads"], answerText:"reading", explanation:"'enjoys' takes the gerund 'reading'." },
+
+  // Modals
+  { sentence: "Which modal expresses advice: 'You ___ speak politely to your elders.'", chapter:"Modals", options:["should","can","will","might"], answerText:"should", explanation:"'Should' is used for advice." },
+  { sentence: "Choose the modal for permission: '___ I borrow your book for a day?'", chapter:"Modals", options:["May","Must","Should","Could"], answerText:"May", explanation:"May asks permission politely." },
+
+  // Degrees of comparison
+  { sentence: "Choose correct: 'Among the three players, Rahul is the ___.'", chapter:"Degrees of Comparison", options:["best","better","good"], answerText:"best", explanation:"Superlative 'best' for 3+ items." },
+  { sentence: "Which is comparative: 'This flower smells ___ than that one.'", chapter:"Degrees of Comparison", options:["sweeter","sweet","sweetest"], answerText:"sweeter", explanation:"Comparative uses '-er'." },
+
+  // Reported speech
+  { sentence: "Reported speech: 'John said, \"I am feeling tired.\"' →", chapter:"Reported Speech", options:["John said he was feeling tired.","John said he is feeling tired.","John says he was feeling tired.","John will say he was feeling tired."], answerText:"John said he was feeling tired.", explanation:"Backshift required in reported speech." },
+
+  // Active/Passive sample
+  { sentence: "Active → Passive: 'The gardener waters the plants every morning.'", chapter:"Active/Passive", options:["The plants are watered every morning.","The plants were watered every morning.","The plants will be watered every morning.","The plants have been watered every morning."], answerText:"The plants are watered every morning.", explanation:"Simple present passive." },
+
+  // Short reading comprehension / The Magic Pencil
+  { sentence: "In 'The Magic Pencil', Anish was not good at:", chapter:"Reading Comprehension", options:["writing and art works","running and swimming","cooking","maths"], answerText:"writing and art works", explanation:"The story says Anish was not good at writing and art works." },
+  { sentence: "Why did the birds fly away from the hunter (from passage)?", chapter:"Reading Comprehension", options:["The sparrow warned them about the net","They were chased by the tiger","They were hungry","They wanted to migrate"], answerText:"The sparrow warned them about the net", explanation:"The sparrow told all birds about the net." },
+
+  // Picture comprehension / basic questions
+  { sentence: "If someone 'waits' for a bus, which preposition usually follows 'wait'?", chapter:"Prepositions", options:["for","at","in","on"], answerText:"for", explanation:"We 'wait for' someone or something." },
+  { sentence: "Choose correct: 'He was born ___ 2002.'", chapter:"Prepositions", options:["in","on","at","by"], answerText:"in", explanation:"Use 'in' with years." },
+
+  // Sentence types
+  { sentence: "What type is: 'What a tall building it is!'?", chapter:"Types of Sentences", options:["Exclamatory","Interrogative","Imperative","Declarative"], answerText:"Exclamatory", explanation:"Exclamatory expresses strong emotion." },
+
+  // Hints/story development (simple)
+  { sentence: "Which sentence is an example of an imperative sentence?", chapter:"Types of Sentences", options:["Keep off the grass.","What a lovely day!","I am reading a newspaper.","Have you lost your money?" ], answerText:"Keep off the grass.", explanation:"Imperative issues a command." },
+
+  // Phrasal verbs
+  { sentence: "Which phrasal verb means 'refuse' in the options: 'took up, turned down, put out'?", chapter:"Phrasal Verbs", options:["turned down","took up","put out","none"], answerText:"turned down", explanation:"Turn down = refuse." },
+
+  // Prepositions & vocabulary
+  { sentence: "Choose the correct preposition: 'She is interested ___ music.'", chapter:"Prepositions", options:["in","on","about","with"], answerText:"in", explanation:"'interested in'." },
+
+  // Dialogue / letter writing basic multi-choice style
+  { sentence: "A leave letter usually starts with: 'To The Class Teacher' and includes which detail:", chapter:"Letter Writing", options:["dates of leave","a recipe","a poem","a map"], answerText:"dates of leave", explanation:"A leave letter includes dates of leave." },
+
+  // More Tense items
+  { sentence: "Choose correct: 'We ____ this movie before.'", chapter:"Verb Tense", options:["have seen","saw","see","am seeing"], answerText:"have seen", explanation:"Present perfect for experience." },
+  { sentence: "Choose correct: 'I ____ my homework when the power went off.'", chapter:"Verb Tense", options:["was doing","did","am doing","had done"], answerText:"was doing", explanation:"Past continuous interrupted by another past action." },
+
+  // Simple comprehension (The Magic Pencil)
+  { sentence: "In the Magic Pencil story the drawing asked Anish to draw a pair of ___?", chapter:"Reading Comprehension", options:["eyes","hands","feet","ears"], answerText:"eyes", explanation:"The drawing asked him to draw a pair of eyes." },
+
+  // Basic vocabulary
+  { sentence: "Choose the correct word: 'He is afraid ___ snakes.'", chapter:"Prepositions", options:["of","from","by","about"], answerText:"of", explanation:"'afraid of'." },
+
+  // Short grammar error correction style
+  { sentence: "Identify the correction: 'They has finished their homework.' →", chapter:"Subject-Verb Agreement", options:["They have finished their homework.","They has finished their homework.","They had finished their homework.","They finishing their homework."], answerText:"They have finished their homework.", explanation:"'They' takes 'have'." },
+
+  // Reading comprehension - Pollution question
+  { sentence: "Pollution prevention is easier than managing pollution after it is created. True or False?", chapter:"Reading Comprehension", options:["True","False","Depends","Not mentioned"], answerText:"True", explanation:"Text states preventing pollution before it is created is easier." },
+
+  // Active/Passive short
+  { sentence: "Passive of 'She cooks food every day.'", chapter:"Voice", options:["Food is cooked by her every day.","Food was cooked by her every day.","Food will be cooked by her every day.","Food has been cooked by her every day."], answerText:"Food is cooked by her every day.", explanation:"Simple present passive." },
+
+  // Small comprehension question (Sonu passage)
+  { sentence: "What did Sonu's mother ask the poor man to do with the money?", chapter:"Reading Comprehension", options:["Buy candles from the shop and sell them near the church","Buy a new house","Travel abroad","Buy jewellery"], answerText:"Buy candles from the shop and sell them near the church", explanation:"The passage says she asked him to get some candles and sell them." },
+
+  // Reported speech small
+  { sentence: "Direct: Rani said, 'We visited the museum yesterday.' Reported:", chapter:"Reported Speech", options:["Rani said they had visited the museum the day before.","Rani said we visited the museum yesterday.","Rani says we visited the museum yesterday.","Rani said they will visit the museum."], answerText:"Rani said they had visited the museum the day before.", explanation:"Backshift and time-word change required." },
+
+  // Simple reading question (The sparrow story)
+  { sentence: "Why did the hunter go without any birds?", chapter:"Reading Comprehension", options:["All the birds flew away","He felt sorry for the birds","He got tired","He changed his mind"], answerText:"All the birds flew away", explanation:"The birds planned and flew away." },
+
+  // Types of sentences: interrogative
+  { sentence: "Which of the following is an interrogative sentence?", chapter:"Types of Sentences", options:["Have you lost your money?","I am reading a newspaper.","What a tall building it is!","Keep off the grass."], answerText:"Have you lost your money?", explanation:"Interrogative asks a question." }
+];
+
+/* ============================
+   Utilities
+   ============================ */
+function shuffleArray(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ============================
+   Quiz state
+   ============================ */
+let selectedIndices = []; // indices in bank chosen for current test
+let currentQ = 0;
+let score = 0;
+let chosenOption = null;
+let presentedQuestions = []; // objects {q:..., options: [...], correctText:..., explanation:...}
+
+const sentenceEl = document.getElementById('sentence');
+const optionsEl = document.getElementById('options');
+const submitBtn = document.getElementById('submitBtn');
+const skipBtn = document.getElementById('skipBtn');
+const nextBtn = document.getElementById('nextBtn');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const qIndexEl = document.getElementById('qIndex');
+const qTotalEl = document.getElementById('qTotal');
+const progressBar = document.getElementById('progressBar');
+const feedback = document.getElementById('feedback');
+const scoreEl = document.getElementById('currentScore');
+const playerName = document.getElementById('playerName');
+
+/* ============================
+   Core functions
+   ============================ */
+
+function prepareTest(){
+  // choose 10 unique random questions across the bank
+  const total = Math.min(10, bank.length);
+  const idxs = Array.from(bank.keys());
+  shuffleArray(idxs);
+  selectedIndices = idxs.slice(0, total);
+  presentedQuestions = selectedIndices.map(i=>{
+    const base = JSON.parse(JSON.stringify(bank[i])); // clone
+    // build an options array and shuffle them
+    const opts = base.options.slice();
+    shuffleArray(opts);
+    return { q: base.sentence, chapter: base.chapter, options: opts, correctText: base.answerText, explanation: base.explanation || "" };
+  });
+  // shuffle the order of selected questions too, to ensure new order every time
+  shuffleArray(presentedQuestions);
+  currentQ = 0;
+  score = 0;
+  chosenOption = null;
+  updateUIForQuestion();
+  scoreEl.textContent = score;
+  qTotalEl.textContent = total;
+  qIndexEl.textContent = currentQ+1;
+  progressBar.style.width = `0%`;
+  feedback.textContent = "";
+  submitBtn.disabled = false;
+  skipBtn.disabled = false;
+  nextBtn.style.display = 'none';
+  restartBtn.style.display = 'inline-block';
+}
+
+function updateUIForQuestion(){
+  const total = presentedQuestions.length;
+  if(currentQ >= total){
+    finishTest();
+    return;
+  }
+  const item = presentedQuestions[currentQ];
+  sentenceEl.textContent = item.q;
+  optionsEl.innerHTML = '';
+  optionsEl.setAttribute('aria-hidden','false');
+  // create option buttons
+  item.options.forEach((optText, idx)=>{
+    const d = document.createElement('div');
+    d.className = 'opt';
+    d.tabIndex = 0;
+    d.setAttribute('role','button');
+    d.setAttribute('data-val', optText);
+    d.textContent = optText;
+    d.addEventListener('click', ()=> selectOption(d));
+    d.addEventListener('keydown', (e)=> { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); selectOption(d); } });
+    optionsEl.appendChild(d);
+  });
+  // state
+  chosenOption = null;
+  submitBtn.disabled = true;
+  skipBtn.disabled = false;
+  nextBtn.style.display = 'none';
+  qIndexEl.textContent = (currentQ+1);
+  // update progress bar
+  const pct = Math.round((currentQ) / presentedQuestions.length * 100);
+  progressBar.style.width = pct + '%';
+  feedback.textContent = '';
+}
+
+function selectOption(el){
+  // clear previous selection
+  const nodes = optionsEl.querySelectorAll('.opt');
+  nodes.forEach(n=>n.classList.remove('selected'));
+  el.classList.add('selected');
+  chosenOption = el.getAttribute('data-val');
+  submitBtn.disabled = false;
+}
+
+function submitAnswer(){
+  if(chosenOption === null){
+    feedback.textContent = 'Please select an option (or Skip).';
+    return;
+  }
+  const item = presentedQuestions[currentQ];
+  const nodes = optionsEl.querySelectorAll('.opt');
+  // mark correct/wrong styles
+  nodes.forEach(n=>{
+    const val = n.getAttribute('data-val');
+    if(val === item.correctText){
+      n.classList.add('correct');
+    }
+    if(val === chosenOption && val !== item.correctText){
+      n.classList.add('wrong');
+    }
+    // disable pointer
+    n.style.pointerEvents = 'none';
+  });
+  // scoring
+  if(chosenOption === item.correctText){
+    score++;
+    feedback.textContent = 'Correct ✓ — ' + (item.explanation ? item.explanation : '');
+  } else {
+    feedback.textContent = 'Wrong ✗ — Correct: "' + item.correctText + '". ' + (item.explanation ? item.explanation : '');
+  }
+  scoreEl.textContent = score;
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  nextBtn.style.display = 'inline-block';
+}
+
+function skipQuestion(){
+  // treat as incorrect but just move on
+  const nodes = optionsEl.querySelectorAll('.opt');
+  nodes.forEach(n=>{
+    const val = n.getAttribute('data-val');
+    if(val === presentedQuestions[currentQ].correctText) n.classList.add('correct');
+    n.style.pointerEvents = 'none';
+  });
+  feedback.textContent = 'Skipped — Correct: "' + presentedQuestions[currentQ].correctText + '".';
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  nextBtn.style.display = 'inline-block';
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ >= presentedQuestions.length){
+    finishTest();
+    return;
+  }
+  chosenOption = null;
+  updateUIForQuestion();
+}
+
+function finishTest(){
+  // show final score & basic summary
+  sentenceEl.textContent = 'Test Complete — your score: ' + score + ' / ' + presentedQuestions.length;
+  optionsEl.innerHTML = '';
+  optionsEl.setAttribute('aria-hidden','true');
+  feedback.innerHTML = `<div>Final Score: <strong>${score}/${presentedQuestions.length}</strong> — ${Math.round(score/presentedQuestions.length*100)}%</div>`;
+  progressBar.style.width = '100%';
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  nextBtn.style.display = 'none';
+  restartBtn.style.display = 'inline-block';
+  // Save to Hall of Fame (localStorage) if high score
+  saveToLocalHof(score);
+}
+
+function startGame(){
+  prepareTest();
+  // adjust UI
+  startBtn.style.display = 'none';
+  document.getElementById('showHofBtn').style.display = 'inline-block';
+}
+
+/* ============================
+   Hall of Fame (local storage simple)
+   ============================ */
+function loadHof(){
+  const raw = localStorage.getItem('thiran_hof_v1');
+  if(!raw) return [];
+  try{
+    return JSON.parse(raw);
+  }catch(e){
+    return [];
+  }
+}
+function saveHof(list){
+  localStorage.setItem('thiran_hof_v1', JSON.stringify(list.slice(0,10)));
+}
+function saveToLocalHof(scoreValue){
+  // if score is among top 10, prompt to save (we show input box in UI when user opens HOF)
+  // here we won't auto-ask; user can open Hall of Fame and save
+  // but we will pre-fill the hofName with playerName
+  const name = (playerName.value||'Anonymous').trim();
+  // do not auto-save; we'll show hall and let user save if they want
+}
+function showHof(){
+  const list = loadHof();
+  const hof = list.slice().sort((a,b)=>b.score-a.score);
+  const hofList = document.getElementById('hofList');
+  hofList.innerHTML = '';
+  if(hof.length===0){
+    hofList.innerHTML = '<div style="padding:8px 0;color:#555">No entries yet.</div>';
+  } else {
+    hof.forEach((h, i)=>{
+      const row = document.createElement('div');
+      row.className = 'hof-item';
+      row.innerHTML = `<div>${i+1}. ${escapeHtml(h.name)}</div><div>${h.score}/10</div>`;
+      hofList.appendChild(row);
+    });
+  }
+  document.getElementById('hall').classList.toggle('hidden');
+}
+
+/* ============================
+   Helpers & events
+   ============================ */
+function escapeHtml(s){ return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+submitBtn.addEventListener('click', submitAnswer);
+skipBtn.addEventListener('click', skipQuestion);
+nextBtn.addEventListener('click', nextQuestion);
+startBtn.addEventListener('click', ()=>{
+  startGame();
+});
+restartBtn.addEventListener('click', ()=>{
+  // reset and show Start
+  startBtn.style.display = 'inline-block';
+  restartBtn.style.display = 'none';
+  sentenceEl.textContent = 'Press <strong>Start Game</strong> to begin the 10 marks test.';
+  optionsEl.innerHTML = '';
+  feedback.textContent = '';
+  score = 0;
+  scoreEl.textContent = 0;
+  progressBar.style.width = '0%';
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  nextBtn.style.display = 'none';
+});
+
+document.getElementById('showHofBtn').addEventListener('click', showHof);
+
+document.getElementById('saveHofBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('hofName').value.trim() || 'Anonymous';
+  const list = loadHof();
+  // ensure only top scores stored (we store up to 10)
+  list.push({ name: name, score: score });
+  list.sort((a,b)=>b.score-a.score);
+  saveHof(list.slice(0,10));
+  showHof();
+  alert('Saved to Hall of Fame (local browser storage).');
+});
+
+/* ============================
+   Initialize basic UI state
+   ============================ */
+(function init(){
+  // initial disabled state
+  submitBtn.disabled = true;
+  skipBtn.disabled = true;
+  nextBtn.style.display = 'none';
+  restartBtn.style.display = 'none';
+  // hide hall initially
+  document.getElementById('hall').classList.add('hidden');
+  // show stored HOF if any
+  // load but do not display automatically
+})();
+</script>
+</body>
+</html>
